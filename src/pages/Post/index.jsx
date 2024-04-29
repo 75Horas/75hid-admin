@@ -5,7 +5,6 @@ import logo from "/assets/image/logo.webp";
 import { useState } from "react";
 import { UpdateCard } from "../../components/Updates/UpdateCard";
 import { useNavigate } from "react-router-dom";
-import { postUpdates } from "../../js/firebase";
 
 export function PostUpdate() {
     const navigate = useNavigate();
@@ -39,30 +38,26 @@ export function PostUpdate() {
         </Tooltip>
     );
 
-    const handleImageChange = (e) => {
-        const data = new FileReader();
-        data.addEventListener('load', () => {
-            setBanner(data.result);
-        });
-        data.readAsDataURL(e.target.files[0]);
-    };
-
     async function handlePostUpdate() {
         event.preventDefault();
-        const newUpdate = {
-            title: title,
-            description: description,
-            url: url,
-            steam: steam,
-            epicgames: epicgames,
-            xbox: xbox,
-            playstation: playstation,
-            banner: banner,
-            date: new Date().toUTCString(),
-        }
 
-        await postUpdates(newUpdate).then(navigate("/"))
-            .catch(error => console.error(error));
+        const formData = new FormData()
+        formData.append("title", title);
+        formData.append("description", description);
+        formData.append("url", url);
+        formData.append("steam", steam);
+        formData.append("epicgames", epicgames);
+        formData.append("xbox", xbox);
+        formData.append("playstation", playstation);
+        formData.append("banner", banner);
+        formData.append("date", new Date().toUTCString())
+
+        try {
+            const response = await axios.post("url", formData);
+            navigate("/");
+        } catch (error) {
+            console.error("Upload failed!", error);
+        }
     }
 
     return (
@@ -125,7 +120,7 @@ export function PostUpdate() {
                         delay={{ show: 250, hide: 400 }}
                         overlay={renderTooltip}
                     >
-                        <Form.Control type="file" onChange={handleImageChange} />
+                        <Form.Control type="file" onChange={(e) => setBanner(e.target.files[0])} />
                     </OverlayTrigger>
                 </Form.Group>
 
@@ -158,16 +153,6 @@ export function PostUpdate() {
                         label="Update prev"
                         onChange={(e) => setShowPreview(e.target.checked)}
                     />
-                    {/* <Form.Check
-                        type="checkbox"
-                        label="Latest prev"
-                        onChange={(e) => setShowPreview(e.target.checked)}
-                    />
-                    <Form.Check
-                        type="checkbox"
-                        label="Carousel prev"
-                        onChange={(e) => setShowPreview(e.target.checked)}
-                    /> */}
                 </div>
 
                 <Button variant="outline-primary" type="submit" onSubmit={() => handlePostUpdate(update)}>

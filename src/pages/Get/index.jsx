@@ -4,12 +4,12 @@ import { Body_Get } from "./index.style";
 import logo from "/assets/image/logo.webp";
 import List from "rc-virtual-list";
 import { useEffect, useState } from "react";
-import { deleteUpdate, getUpdates } from "../../js/firebase";
 
 import { BsTwitterX } from "react-icons/bs";
 import { FaInbox } from "react-icons/fa6";
 import { FaPen, FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export function GetUpdates() {
     const navigate = useNavigate();
@@ -22,7 +22,6 @@ export function GetUpdates() {
     const handleDelete = () => {
         setShow(false)
         console.log(deleteUpdateId);
-        deleteUpdate(deleteUpdateId)
     };
     const handleShow = (id) => {
         setShow(true)
@@ -30,20 +29,23 @@ export function GetUpdates() {
     };
 
     useEffect(() => {
-        if (updates === null) {
-            getUpdates().then((res) => {
-                if (Array.isArray(res)) {
-                    setUpdates(res);
-                    console.log([res]);
-                    setUpdatesLength(res.length);
-                } else {
-                    console.error(res);
-                }
-            }).catch((error) => {
-                console.error(error);
-            })
-        }
+        const fetchUpdates = async () => {
+            try {
+                const response = await axios.get("https://75hid-api-production.up.railway.app/updates");
+                const data = await response.data
+
+                data.forEach(update => {
+                    // update.bannerData = update.banner;
+                    // delete update.banner;
+                });
+                setUpdates(data);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        fetchUpdates();
     }, []);
+
 
     return (
         <Body_Get>
@@ -81,7 +83,6 @@ export function GetUpdates() {
                                     </div>
                                     <div className="icon-container">
                                         <BsTwitterX className="icon" onClick={() => { window.open(index.url, "_blank") }} />
-                                        <FaPen className="icon" onClick={() => { }} />
                                         <FaTrash className="icon trash" onClick={() => { handleShow(index.id) }} />
                                     </div>
                                 </div>

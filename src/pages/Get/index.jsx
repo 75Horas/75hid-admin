@@ -7,37 +7,40 @@ import { useEffect, useState } from "react";
 
 import { BsTwitterX } from "react-icons/bs";
 import { FaInbox } from "react-icons/fa6";
-import { FaPen, FaTrash } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export function GetUpdates() {
+    const baseUrl = "https://75hid-api-production.up.railway.app/admin"
     const navigate = useNavigate();
     const [updates, setUpdates] = useState(null);
     const [updatesLength, setUpdatesLength] = useState(0);
-    const [deleteUpdateId, setDeleteUpdateId] = useState("");
 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
-    const handleDelete = () => {
-        setShow(false)
-        console.log(deleteUpdateId);
-    };
-    const handleShow = (id) => {
-        setShow(true)
-        setDeleteUpdateId(id)
+
+    const handleDelete = async (updateId) => {
+        try {
+            await axios.delete(`${baseUrl}/updates/delete`, {
+                data: { id: updateId }
+            })
+            if (response.status === 200) {
+                console.log("Update deleted successfully");
+            } else {
+                console.error("Error deleting update", response.data.error);
+            }
+        } catch (error) {
+            console.error('Error during deletion:', error);
+        }
     };
 
     useEffect(() => {
         const fetchUpdates = async () => {
             try {
-                const response = await axios.get("https://75hid-api-production.up.railway.app/updates");
+                const response = await axios.get(`${baseUrl}/updates`);
                 const data = await response.data
 
-                data.forEach(update => {
-                    // update.bannerData = update.banner;
-                    // delete update.banner;
-                });
                 setUpdates(data);
             } catch (err) {
                 console.error(err);
@@ -70,7 +73,7 @@ export function GetUpdates() {
                                     <Image
                                         className="update-banner"
                                         src={index.banner}
-                                        alt={index.banner}
+                                        alt={`Update Banner for ${index.id}`}
                                         loading="lazy"
                                         draggable={false}
                                     />
@@ -83,7 +86,7 @@ export function GetUpdates() {
                                     </div>
                                     <div className="icon-container">
                                         <BsTwitterX className="icon" onClick={() => { window.open(index.url, "_blank") }} />
-                                        <FaTrash className="icon trash" onClick={() => { handleShow(index.id) }} />
+                                        <FaTrash className="icon trash" onClick={() => { handleDelete(index.id) }} />
                                     </div>
                                 </div>
                             </div>

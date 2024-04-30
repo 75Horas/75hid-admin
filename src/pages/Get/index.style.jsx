@@ -38,7 +38,8 @@ export const Body_Get = styled.div`
     .update-banner{
         max-width: 100%;
         width: 268px;
-        height: 100%;
+        max-height: 100%;
+        height: 136px;
         object-fit: cover;
     }
     .update-details{

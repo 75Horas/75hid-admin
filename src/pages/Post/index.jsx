@@ -5,10 +5,10 @@ import logo from "/assets/image/logo.webp";
 import { useState } from "react";
 import { UpdateCard } from "../../components/Updates/UpdateCard";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export function PostUpdate() {
     const navigate = useNavigate();
-
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [url, setUrl] = useState("");
@@ -20,16 +20,14 @@ export function PostUpdate() {
 
     const [showPreview, setShowPreview] = useState(false);
 
-    const update = {
-        title,
-        description,
-        url,
-        banner,
-        steam,
-        epicgames,
-        xbox,
-        playstation,
-    };
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
 
     const renderTooltip = (props) => (
         <Tooltip id="button-tooltip" {...props}>
@@ -41,20 +39,26 @@ export function PostUpdate() {
     async function handlePostUpdate() {
         event.preventDefault();
 
-        const formData = new FormData()
-        formData.append("title", title);
-        formData.append("description", description);
-        formData.append("url", url);
-        formData.append("steam", steam);
-        formData.append("epicgames", epicgames);
-        formData.append("xbox", xbox);
-        formData.append("playstation", playstation);
-        formData.append("banner", banner);
-        formData.append("date", new Date().toUTCString())
+        const bannerBase64 = await fileToBase64(banner)
+
+        const update = {
+            title,
+            description,
+            date: new Date(),
+            steam,
+            epicgames,
+            xbox,
+            playstation,
+            banner: bannerBase64,
+            url,
+        };
 
         try {
-            const response = await axios.post("url", formData);
-            navigate("/");
+            console.log(update);
+            await axios.post("https://75hid-api-production.up.railway.app/admin/updates/post", update)
+            console.log(res)
+            navigate("/")
+
         } catch (error) {
             console.error("Upload failed!", error);
         }
@@ -120,7 +124,7 @@ export function PostUpdate() {
                         delay={{ show: 250, hide: 400 }}
                         overlay={renderTooltip}
                     >
-                        <Form.Control type="file" onChange={(e) => setBanner(e.target.files[0])} />
+                        <Form.Control type="file" name="image" accept="image/*" onChange={(e) => setBanner(e.target.files[0])} />
                     </OverlayTrigger>
                 </Form.Group>
 

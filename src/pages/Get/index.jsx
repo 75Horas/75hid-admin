@@ -15,15 +15,23 @@ export function GetUpdates() {
     const baseUrl = "https://75hid-api-production.up.railway.app/admin"
     const navigate = useNavigate();
     const [updates, setUpdates] = useState(null);
-    const [updatesLength, setUpdatesLength] = useState(0);
+    const [updateID, setUpdateID] = useState("");
 
     const [show, setShow] = useState(false);
-    const handleClose = () => setShow(false);
+    const handleClose = () => {
+        setShow(false)
+        setUpdateID("");
+    };
 
-    const handleDelete = async (updateId) => {
+    const handleShow = (id) => {
+        setUpdateID(id)
+        setShow(true)
+    }
+
+    const handleDelete = async () => {
         try {
-            await axios.delete(`${baseUrl}/updates/delete`, {
-                data: { id: updateId }
+            const response = await axios.delete(`${baseUrl}/updates/delete`, {
+                data: { id: updateID }
             })
             if (response.status === 200) {
                 console.log("Update deleted successfully");
@@ -33,6 +41,8 @@ export function GetUpdates() {
         } catch (error) {
             console.error('Error during deletion:', error);
         }
+
+        setShow(false)
     };
 
     useEffect(() => {
@@ -86,7 +96,7 @@ export function GetUpdates() {
                                     </div>
                                     <div className="icon-container">
                                         <BsTwitterX className="icon" onClick={() => { window.open(index.url, "_blank") }} />
-                                        <FaTrash className="icon trash" onClick={() => { handleDelete(index.id) }} />
+                                        <FaTrash className="icon trash" onClick={() => { handleShow(index.id) }} />
                                     </div>
                                 </div>
                             </div>

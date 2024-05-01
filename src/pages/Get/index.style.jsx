@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const Body_Get = styled.div`
 
     color: rgba(255, 255, 255, 0.8);
-   
+
     .container{
         display: flex;
         flex-direction: column;
@@ -13,67 +13,37 @@ export const Body_Get = styled.div`
     
     .logo{
         max-width: 100%;
-        width: 428px;
+        width: 328px;
         height: 100%;
 
     }
+    .buttons-container{
+        display: flex;
+        width: 100%;
+
+        border-bottom: 2px solid #9EC8B9;
+    }
+
+    .btn-filter{
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        background-color: transparent;
+        border: 2px solid #9EC8B9;
+        border-bottom: none;
+    }
+    .btn-filter:hover{
+        background-color: #9EC8B9;
+        border: 2px solid #9EC8B9;
+        border-bottom: none;
+    }
+    .selected-button{
+        background-color: #9EC8B9;
+    }
+
+
     .rc-virtual-list-holder-inner{
         display: flex;
         gap: 0.6rem;
     }
 
-    .update-containter{
-        display: flex;
-        border-radius: 1rem;
-        border: 2px solid transparent;
-
-        overflow: hidden;
-        transition: border 0.5s;
-    }
-    .update-containter:hover{
-        border: 2px solid #9EC8B9;
-    }
-    .update-banner-containter{
-    }
-    .update-banner{
-        max-width: 100%;
-        width: 268px;
-        max-height: 100%;
-        height: 136px;
-        object-fit: cover;
-    }
-    .update-details{
-        text-align: start;
-    }
-    .contents-container{
-        display: flex;
-        width: 100%;
-        padding: 0 1rem;
-        justify-content: space-between;
-    }
-    .icon-container{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 1rem;
-    }
-    .icon{
-        transition: color 0.5s ;
-    }
-    .icon:hover{
-        color: #0091d0;
-    }
-    .trash:hover{
-        color: #e70000;
-    }
-
-    .empty-list{
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 1rem;
-        height: 50vh;
-        opacity: 0.5;
-    }
 `;

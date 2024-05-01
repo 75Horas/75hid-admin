@@ -10,12 +10,15 @@ import { FaInbox } from "react-icons/fa6";
 import { FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { UpdatesList } from "../../components/Updates/List";
+import { CollaboratorsList } from "../../components/Collaborators/List";
 
 export function GetUpdates() {
     const baseUrl = "https://75hid-api-production.up.railway.app/admin"
     const navigate = useNavigate();
     const [updates, setUpdates] = useState(null);
     const [updateID, setUpdateID] = useState("");
+    const [selected, setSelected] = useState("updates");
 
     const [show, setShow] = useState(false);
     const handleClose = () => {
@@ -41,7 +44,6 @@ export function GetUpdates() {
         } catch (error) {
             console.error('Error during deletion:', error);
         }
-
         setShow(false)
     };
 
@@ -50,8 +52,7 @@ export function GetUpdates() {
             try {
                 const response = await axios.get(`${baseUrl}/updates`);
                 const data = await response.data
-
-                setUpdates(data);
+                setUpdates(data.length === 0 ? null : data);
             } catch (err) {
                 console.error(err);
             }
@@ -69,52 +70,18 @@ export function GetUpdates() {
                     alt={logo}
                     draggable={false}
                 />
-
-                {updates !== null ? (
-                    <List
-                        data={updates}
-                        height={"50vh"}
-                        itemHeight={30}
-                        itemKey="id"
-                    >
-                        {index =>
-                            <div key={index.id} className="update-containter">
-                                <div className="update-banner-container">
-                                    <Image
-                                        className="update-banner"
-                                        src={index.banner}
-                                        alt={`Update Banner for ${index.id}`}
-                                        loading="lazy"
-                                        draggable={false}
-                                    />
-                                </div>
-                                <div className="contents-container">
-                                    <div className="update-details">
-                                        <h2>{index.title}</h2>
-                                        <p>{index.description}</p>
-                                        <p>{index.date}</p>
-                                    </div>
-                                    <div className="icon-container">
-                                        <BsTwitterX className="icon" onClick={() => { window.open(index.url, "_blank") }} />
-                                        <FaTrash className="icon trash" onClick={() => { handleShow(index.id) }} />
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    </List>
-                ) : (
-                    <div className="empty-list">
-                        <FaInbox size={"96px"} />
-                        <p>No update available, click the button below to add a new update</p>
+                <div>
+                    <div className="buttons-container">
+                        <Button onClick={() => { setSelected("updates") }} className={`${selected === "updates" ? "selected-button" : ""} btn-filter`}>UPDATES</Button>
+                        <Button onClick={() => { setSelected("collaborators") }} className={`${selected === "collaborators" ? "selected-button" : ""} btn-filter`}>COLLABORATORS</Button>
                     </div>
-                )}
-                <div className="button-container">
-                    <Button variant="outline-primary"
-                        onClick={() => navigate("/post")}
-                    >
-                        Post new update
-                    </Button>
+                    {selected === "updates" ? (
+                        <UpdatesList updates={updates} />
+                    ) : (
+                        <CollaboratorsList collaborators={updates} />
+                    )}
                 </div>
+               
             </Container>
 
             <Modal show={show} onHide={handleClose} centered >

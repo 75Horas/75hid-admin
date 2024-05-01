@@ -3,12 +3,14 @@ import { Body_PostUpdate } from "./index.style";
 
 import logo from "/assets/image/logo.webp";
 import { useState } from "react";
-import { UpdateCard } from "../../components/Updates/UpdateCard";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { UpdateCard } from "../../components/Updates/UpdateCard";
 
 export function PostUpdate() {
     const navigate = useNavigate();
+    const baseUrl = "https://75hid-api-production.up.railway.app";
+
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [url, setUrl] = useState("");
@@ -38,8 +40,9 @@ export function PostUpdate() {
 
     async function handlePostUpdate() {
         event.preventDefault();
-
         const bannerBase64 = await fileToBase64(banner)
+        const estimatedSizeInBytes = bannerBase64.length * 3 / 4;
+        const estimatedSizeInMegaBytes = (estimatedSizeInBytes / 1048576).toFixed(2);
 
         const update = {
             title,
@@ -54,11 +57,15 @@ export function PostUpdate() {
         };
 
         try {
-            console.log(update);
-            await axios.post("https://75hid-api-production.up.railway.app/admin/updates/post", update)
-            console.log(res)
-            navigate("/")
-
+            if (estimatedSizeInMegaBytes > 6.0) {
+                return console.error("Image size larger than 6MB:", estimatedSizeInMegaBytes + "MB");
+            } else {
+                const response = await axios.post(`${baseUrl}/admin/updates/post`, update);
+                if (response.status === 200) {
+                    console.log("Update posted successfully");
+                    navigate("/");
+                }
+            }
         } catch (error) {
             console.error("Upload failed!", error);
         }
@@ -66,9 +73,7 @@ export function PostUpdate() {
 
     return (
         <Body_PostUpdate id="/post">
-            <CloseButton variant="white" onClick={() => {
-                navigate("/");
-            }} />
+            <CloseButton variant="white" onClick={() => { navigate("/") }} />
 
             <Form onSubmit={handlePostUpdate}>
                 <Image
